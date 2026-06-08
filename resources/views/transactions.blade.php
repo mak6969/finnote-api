@@ -38,13 +38,70 @@
                             Rp {{ number_format($t->amount) }}
                         </td>
                         <td class="text-center">
-                            <form action="{{ route('transactions.destroy', $t->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus transaksi ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <i class="fas fa-trash"></i>
+                            <div class="d-flex justify-content-center gap-1">
+                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editTransactionModal{{ $t->id }}">
+                                    <i class="fas fa-edit"></i>
                                 </button>
-                            </form>
+                                <form action="{{ route('transactions.destroy', $t->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus transaksi ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Modal Edit Transaksi -->
+                            <div class="modal fade text-start" id="editTransactionModal{{ $t->id }}" tabindex="-1" aria-labelledby="editTransactionModalLabel{{ $t->id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <form action="{{ route('transactions.update', $t->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editTransactionModalLabel{{ $t->id }}">Edit Transaksi</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label for="category_id_{{ $t->id }}" class="form-label">Kategori</label>
+                                                    <select name="category_id" id="category_id_{{ $t->id }}" class="form-select" required>
+                                                        <option value="">Pilih Kategori</option>
+                                                        @foreach($categories as $cat)
+                                                            <option value="{{ $cat->id }}" {{ $t->category_id == $cat->id ? 'selected' : '' }}>
+                                                                {{ $cat->name }} ({{ $cat->type == 'income' ? 'Pemasukan' : 'Pengeluaran' }})
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="type_{{ $t->id }}" class="form-label">Tipe</label>
+                                                    <select name="type" id="type_{{ $t->id }}" class="form-select" required>
+                                                        <option value="income" {{ $t->type == 'income' ? 'selected' : '' }}>Pemasukan</option>
+                                                        <option value="expense" {{ $t->type == 'expense' ? 'selected' : '' }}>Pengeluaran</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="amount_{{ $t->id }}" class="form-label">Jumlah (Rupiah)</label>
+                                                    <input type="number" name="amount" id="amount_{{ $t->id }}" class="form-control" min="0" step="any" value="{{ (int)$t->amount }}" placeholder="Contoh: 50000" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="transaction_date_{{ $t->id }}" class="form-label">Tanggal</label>
+                                                    <input type="date" name="transaction_date" id="transaction_date_{{ $t->id }}" class="form-control" value="{{ \Carbon\Carbon::parse($t->transaction_date)->format('Y-m-d') }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="description_{{ $t->id }}" class="form-label">Deskripsi</label>
+                                                    <textarea name="description" id="description_{{ $t->id }}" class="form-control" rows="3" placeholder="Deskripsi transaksi...">{{ $t->description }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     @empty

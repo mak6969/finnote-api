@@ -60,6 +60,25 @@ class WebController extends Controller
         return redirect()->back()->with('success', 'Transaksi berhasil ditambahkan!');
     }
 
+    public function updateTransaction(Request $request, \App\Models\Transaction $transaction)
+    {
+        if ($transaction->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'category_id'      => 'required|exists:categories,id',
+            'type'             => 'required|in:income,expense',
+            'amount'           => 'required|numeric|min:0',
+            'description'      => 'nullable|string',
+            'transaction_date' => 'required|date',
+        ]);
+
+        $transaction->update($request->all());
+
+        return redirect()->back()->with('success', 'Transaksi berhasil diperbarui!');
+    }
+
     public function destroyTransaction(\App\Models\Transaction $transaction)
     {
         if ($transaction->user_id !== Auth::id()) {

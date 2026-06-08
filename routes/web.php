@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [WebController::class, 'dashboard'])->name('dashboard');
     Route::get('/transactions', [WebController::class, 'transactions'])->name('transactions');
     Route::post('/transactions', [WebController::class, 'storeTransaction'])->name('transactions.store');
+    Route::put('/transactions/{transaction}', [WebController::class, 'updateTransaction'])->name('transactions.update');
     Route::delete('/transactions/{transaction}', [WebController::class, 'destroyTransaction'])->name('transactions.destroy');
 
     Route::get('/categories', [WebController::class, 'categories'])->name('categories');
